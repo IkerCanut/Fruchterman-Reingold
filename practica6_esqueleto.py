@@ -12,7 +12,7 @@ from numpy import random
 
 class LayoutGraph:
 
-    def __init__(self, grafo, iters, refresh, c1, c2, verbose, width, height):
+    def __init__(self, grafo, iters, refresh, c1, c2, verbose, width, height, temp):
         """
         Parámetros:
         grafo: grafo en formato lista
@@ -40,6 +40,7 @@ class LayoutGraph:
         self.c2 = c2
         self.width = width
         self.height = height
+        self.temp = temp
 
     def calcular_k(self, area, n, c):
         return c * np.sqrt(area/n)
@@ -59,8 +60,7 @@ class LayoutGraph:
         for v in V:
             accum[v] = [0, 0]
 
-    def compute_attraction_forces(self, V, E, pos, accum):
-        c = 1.8
+    def compute_attraction_forces(self, V, E, pos, accum, c):
         k = self.calcular_k(self.width * self.height, len(V), c)
         for u, v in E:
             distance = np.sqrt((pos[u][0] - pos[v][0]) ** 2 +
@@ -75,8 +75,7 @@ class LayoutGraph:
             accum[v][0] -= fx
             accum[v][1] -= fy
 
-    def compute_repulsion_forces(self, V, pos, accum):
-        c = 1.8
+    def compute_repulsion_forces(self, V, pos, accum, c):
         k = self.calcular_k(self.width * self.height, len(V), c)
         for u in V:
             for v in V:
@@ -93,19 +92,46 @@ class LayoutGraph:
                     accum[v][0] += fx
                     accum[v][1] += fy
 
-    def update_positions(self, V, pos, accum):
-        print(accum)
+    def compute_gravity_forces(self, V, pos, accum, c):
+        k = self.calcular_k(self.width * self.height, len(V), c)
+
+        centro_x = self.width/2
+        centro_y = self.height/2
+
         for v in V:
+            distance = np.sqrt((centro_x - pos[v][0]) ** 2 +
+                               (centro_y - pos[v][1]) ** 2)
+            if distance == 0:
+                distance = 0.05
+            mod_fa = self.fa(distance, k)
+            fx = mod_fa * (pos[v][0] - centro_x) / distance
+            fy = mod_fa * (pos[v][1] - centro_y) / distance
+            accum[v][0] -= fx / 10
+            accum[v][1] -= fy / 10
+
+    def update_positions(self, V, pos, accum):
+        for v in V:
+            modulo = np.sqrt(accum[v][0] ** 2 + accum[v][1] ** 2)
+            if modulo > self.temp:
+                accum[v][0] *= self.temp / modulo
+                accum[v][1] *= self.temp / modulo
+
             pos[v][0] += accum[v][0]
             pos[v][1] += accum[v][1]
-            if pos[v][0] < 0:
+
+            '''if pos[v][0] < 0:
                 pos[v][0] = 0
             if pos[v][1] < 0:
                 pos[v][1] = 0
             if pos[v][0] > self.width:
                 pos[v][0] = self.width
             if pos[v][1] > self.height:
-                pos[v][1] = self.height
+                pos[v][1] = self.height'''
+
+    def update_temperature(self):
+        ct = 0.999
+        self.temp *= ct
+        print(self.temp)
 
     def draw(self, E, posiciones):
         plt.clf()
@@ -115,7 +141,7 @@ class LayoutGraph:
             y = [posiciones[a][1], posiciones[b][1]]
             plt.plot(x, y, marker='.', markersize=10)
 
-        plt.pause(1)
+        plt.pause(.001)
 
     def layout(self):
         """
@@ -127,14 +153,18 @@ class LayoutGraph:
         posiciones = {}
         accum = {}
 
+        c = 1.5
+
         self.randomize_positions(V, posiciones)
         self.draw(E, posiciones)
 
         for i in range(self.iters):
             self.initialize_accumulators(V, accum)
-            self.compute_attraction_forces(V, E, posiciones, accum)
-            self.compute_repulsion_forces(V, posiciones, accum)
+            self.compute_attraction_forces(V, E, posiciones, accum, c)
+            self.compute_repulsion_forces(V, posiciones, accum, c)
+            self.compute_gravity_forces(V, posiciones, accum, c)
             self.update_positions(V, posiciones, accum)
+            self.update_temperature()
             self.draw(E, posiciones)
 
         # for v in V:
@@ -184,7 +214,7 @@ def main():
         '--height',
         type=float,
         help='Altura maxima',
-        default=1000.0
+        default=1500.0
     )
 
     args = parser.parse_args()
@@ -209,7 +239,8 @@ def main():
         c2=5.0,
         verbose=args.verbose,
         width=args.width,
-        height=args.height
+        height=args.height,
+        temp=args.temp
     )
 
     # # Ejecutamos el layout
