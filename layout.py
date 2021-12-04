@@ -53,7 +53,7 @@ class Layout:
 
     def randomize_positions(self):
         '''Randomizes initial positions'''
-        print("Randomizing positions") if self.verbose else None
+        print("Randomizing positions\n") if self.verbose else None
         for v in self.graph.nodes:
             self.pos[v] = [random.uniform(-0.5*self.width, 0.5*self.width),
                            random.uniform(-0.5*self.width, 0.5*self.width)]
@@ -116,7 +116,7 @@ class Layout:
     def update_positions(self):
         '''Updates positions with the previously calculated values'''
         if (self.verbose):
-            print("\nNueva iteracion: Acumulacion de fuerzas:")
+            print("\nNew iteration: Forces: ")
             for v in self.graph.nodes:
                 print("Node %s: \t X axis = %f \t Y axis = %f" %
                       (v, self.accum[v][0], self.accum[v][1]))
@@ -171,6 +171,13 @@ class Layout:
         plt.figure("Graph plot")
         self.randomize_positions()
 
+        if(self.verbose):
+            print("Initial positions:")
+            for v in self.graph.nodes:
+                print("Node %s \t X position = %f \t Y Position = %f" %
+                      (v, self.pos[v][0], self.pos[v][1]))
+            print()
+
         min_t = 0.05
         print("Waiting until graph cools completely or iterations run short") if self.verbose else None
         print("You can add several options to the program, run next time with -h or --help to see") if self.verbose else None
@@ -190,6 +197,6 @@ class Layout:
 
         self.draw()
         print(
-            "Algorithm finished! Beautiful graph, by the way ;)") if self.verbose else None
+            "\nAlgorithm finished! Beautiful graph, by the way ;)") if self.verbose else None
         print("When you're done admiring it, you can close the window") if self.verbose else None
         plt.show()
