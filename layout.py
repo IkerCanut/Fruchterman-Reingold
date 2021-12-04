@@ -5,17 +5,17 @@ from numpy import random
 
 class Layout:
     
-    def __init__(self, grafo, iters, refresh, verbose, width, height, temp, c, p, d):
+    def __init__(self, graph, iters, refresh, verbose, width, height, temp, c, p, d):
         """
-        Parámetros:
-        grafo: grafo en formato lista
+        Params:
+        graph: graph en formato lista
         iters: cantidad de iteraciones a realizar
         refresh: cada cuántas iteraciones graficar. Si su valor es cero, entonces debe graficarse solo al final.
         verbose: si está encendido, activa los comentarios
         """
 
-        self.grafo = grafo
-        self.posiciones = {}
+        self.graph = graph
+        self.positions = {}
         self.fuerzas = {}
         self.iters = iters
         self.verbose = verbose
@@ -26,33 +26,32 @@ class Layout:
         self.c = c
         self.p = p
         self.ct = d
+        self.area = self.width * self.height
+        self.k = self.c * np.sqrt(self.area/self.graph.n)
+    
+    
+    def fa(self, d):
+        return d*d / self.k
 
-    def calc_k(self, area, n, c):
-        return c * np.sqrt(area/n)
+    def fr(self, d):
+        return self.k*self.k / d
 
-    def fa(self, d, k):
-        return d*d / k
+    def randomize_positions(self, positions):
+        for v in self.graph.nodes:
+            positions[v] = [random.uniform(0, 0.5*self.width),
+                            random.uniform(0, 0.5*self.height)]
 
-    def fr(self, d, k):
-        return k*k / d
-
-    def randomize_positions(self, V, posiciones):
-        for v in V:
-            posiciones[v] = [random.uniform(
-                0, 0.5*self.width), random.uniform(0, 0.5*self.height)]
-
-    def initialize_accumulators(self, V, accum):
-        for v in V:
+    def initialize_accumulators(self, accum):
+        for v in self.graph.nodes:
             accum[v] = [0, 0]
 
-    def compute_attraction_forces(self, V, E, pos, accum, c):
-        k = self.calc_k(self.width * self.height, len(V), c)
-        for u, v in E:
+    def compute_attraction_forces(self, pos, accum):
+        for u, v in self.graph.edges:
             distance = np.sqrt((pos[u][0] - pos[v][0]) ** 2 +
                                (pos[u][1] - pos[v][1]) ** 2)
             if distance == 0:
                 distance = 0.05
-            mod_fa = self.fa(distance, k)
+            mod_fa = self.fa(distance)
             fx = mod_fa * (pos[v][0] - pos[u][0]) / distance
             fy = mod_fa * (pos[v][1] - pos[u][1]) / distance
             accum[u][0] += fx
@@ -60,42 +59,39 @@ class Layout:
             accum[v][0] -= fx
             accum[v][1] -= fy
 
-    def compute_repulsion_forces(self, V, pos, accum, c):
-        k = self.calc_k(self.width * self.height, len(V), c)
-        for u in V:
-            for v in V:
-                if u != v:
+    def compute_repulsion_forces(self, pos, accum):
+        for u in self.graph.nodes:
+            for v in self.graph.nodes:
+                if v != u:
                     distance = np.sqrt((pos[u][0] - pos[v][0]) ** 2 +
                                        (pos[u][1] - pos[v][1]) ** 2)
                     if (distance == 0):
                         distance = 0.05
-                    mod_fr = self.fr(distance, k)
+                    mod_fr = self.fr(distance)
                     fx = mod_fr * (pos[v][0] - pos[u][0]) / distance
                     fy = mod_fr * (pos[v][1] - pos[u][1]) / distance
-                    accum[u][0] -= fx
-                    accum[u][1] -= fy
-                    accum[v][0] += fx
-                    accum[v][1] += fy
+                    accum[u][0] -= fx/2     #Estamos calculando 2 veces para cada par
+                    accum[u][1] -= fy/2
+                    accum[v][0] += fx/2
+                    accum[v][1] += fy/2
 
-    def compute_gravity_forces(self, V, pos, accum, c):
-        k = self.calc_k(self.width * self.height, len(V), c)
-
+    def compute_gravity_forces(self, pos, accum):
         centro_x = self.width/2
         centro_y = self.height/2
 
-        for v in V:
+        for v in self.graph.nodes:
             distance = np.sqrt((centro_x - pos[v][0]) ** 2 +
                                (centro_y - pos[v][1]) ** 2)
             if distance == 0:
                 distance = 0.05
-            mod_fa = self.fa(distance, k)
+            mod_fa = self.fa(distance)
             fx = mod_fa * (pos[v][0] - centro_x) / distance
             fy = mod_fa * (pos[v][1] - centro_y) / distance
             accum[v][0] -= fx / 10
             accum[v][1] -= fy / 10
 
-    def update_positions(self, V, pos, accum):
-        for v in V:
+    def update_positions(self, pos, accum):
+        for v in self.graph.nodes:
             modulo = np.sqrt(accum[v][0] ** 2 + accum[v][1] ** 2)
             if modulo > self.temp:
                 accum[v][0] *= self.temp / modulo
@@ -118,12 +114,12 @@ class Layout:
         self.temp *= ct
         #print(self.temp)
 
-    def draw(self, E, posiciones):
+    def draw(self, positions):
         plt.clf()
-
-        for (a, b) in E:
-            x = [posiciones[a][0], posiciones[b][0]]
-            y = [posiciones[a][1], posiciones[b][1]]
+        
+        for (a, b) in self.graph.edges:
+            x = [positions[a][0], positions[b][0]]
+            y = [positions[a][1], positions[b][1]]
             plt.plot(x, y, marker='.', markersize=10)
 
         plt.pause(self.p)
@@ -133,21 +129,18 @@ class Layout:
         Aplica el algoritmo de Fruchtermann-Reingold para obtener (y mostrar)
         un layout
         """
-        (V, E) = (self.grafo.nodes, self.grafo.edges)
 
-        posiciones = {}
+        positions = {}
         accum = {}
 
-        c = self.c
-
-        self.randomize_positions(V, posiciones)
-        self.draw(E, posiciones)
+        self.randomize_positions(positions)
+        self.draw(positions)
 
         for i in range(self.iters):
-            self.initialize_accumulators(V, accum)
-            self.compute_attraction_forces(V, E, posiciones, accum, c)
-            self.compute_repulsion_forces(V, posiciones, accum, c)
-            self.compute_gravity_forces(V, posiciones, accum, c)
-            self.update_positions(V, posiciones, accum)
+            self.initialize_accumulators(accum)
+            self.compute_attraction_forces(positions, accum)
+            self.compute_repulsion_forces(positions, accum)
+            self.compute_gravity_forces(positions, accum)
+            self.update_positions(positions, accum)
             self.update_temperature()
-            self.draw(E, posiciones)
+            self.draw(positions)
