@@ -116,6 +116,10 @@ class Layout:
 
     def draw(self, positions):
         plt.clf()
+        LEFT_BOUND, RIGHT_BOUND = -2000, 2000
+        BOTTOM_BOUND, TOP_BOUND = -2000, 2000
+        plt.xlim(LEFT_BOUND, RIGHT_BOUND)
+        plt.ylim(BOTTOM_BOUND, TOP_BOUND)
         
         for (a, b) in self.graph.edges:
             x = [positions[a][0], positions[b][0]]
