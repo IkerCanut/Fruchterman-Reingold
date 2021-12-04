@@ -5,7 +5,7 @@ from numpy import random
 
 class Layout:
     
-    def __init__(self, graph, iters, refresh, verbose, width, height, temp, c, p, d):
+    def __init__(self, graph, name, iters, refresh, verbose, width, margin, temp, c, p, d):
         """
         Params:
         graph: graph en formato lista
@@ -15,18 +15,19 @@ class Layout:
         """
 
         self.graph = graph
+        self.name = name
         self.positions = {}
         self.fuerzas = {}
         self.iters = iters
         self.verbose = verbose
         self.refresh = refresh
         self.width = width
-        self.height = height
+        self.margin = margin
         self.temp = temp
         self.c = c
         self.p = p
         self.ct = d
-        self.area = self.width * self.height
+        self.area = self.width * self.width
         self.k = self.c * np.sqrt(self.area/self.graph.n)
     
     
@@ -39,18 +40,23 @@ class Layout:
     def randomize_positions(self, positions):
         for v in self.graph.nodes:
             positions[v] = [random.uniform(-0.5*self.width,  0.5*self.width),
-                            random.uniform(-0.5*self.height, 0.5*self.height)]
+                            random.uniform(-0.5*self.width, 0.5*self.width)]
 
     def initialize_accumulators(self, accum):
         for v in self.graph.nodes:
             accum[v] = [0, 0]
-
+    
+    def clamp_eps(self, distance):
+        eps = 0.05
+        distance = eps if distance < eps else distance
+        return distance
+    
     def compute_attraction_forces(self, pos, accum):
         for u, v in self.graph.edges:
             distance = np.sqrt((pos[u][0] - pos[v][0]) ** 2 +
                                (pos[u][1] - pos[v][1]) ** 2)
-            if distance == 0:
-                distance = 0.05
+            
+            distance = self.clamp_eps(distance)
             mod_fa = self.fa(distance)
             fx = mod_fa * (pos[v][0] - pos[u][0]) / distance
             fy = mod_fa * (pos[v][1] - pos[u][1]) / distance
@@ -65,8 +71,7 @@ class Layout:
                 if v != u:
                     distance = np.sqrt((pos[u][0] - pos[v][0]) ** 2 +
                                        (pos[u][1] - pos[v][1]) ** 2)
-                    if (distance == 0):
-                        distance = 0.05
+                    distance = self.clamp_eps(distance)
                     mod_fr = self.fr(distance)
                     fx = mod_fr * (pos[v][0] - pos[u][0]) / distance
                     fy = mod_fr * (pos[v][1] - pos[u][1]) / distance
@@ -82,8 +87,7 @@ class Layout:
         for v in self.graph.nodes:
             distance = np.sqrt((centro_x - pos[v][0]) ** 2 +
                                (centro_y - pos[v][1]) ** 2)
-            if distance == 0:
-                distance = 0.05
+            distance = self.clamp_eps(distance)
             mod_fa = self.fa(distance)
             fx = mod_fa * (pos[v][0] - centro_x) / distance
             fy = mod_fa * (pos[v][1] - centro_y) / distance
@@ -99,25 +103,28 @@ class Layout:
 
             pos[v][0] += accum[v][0]
             pos[v][1] += accum[v][1]
-
-            '''if pos[v][0] < 0:
-                pos[v][0] = 0
-            if pos[v][1] < 0:
-                pos[v][1] = 0
-            if pos[v][0] > self.width:
-                pos[v][0] = self.width
-            if pos[v][1] > self.height:
-                pos[v][1] = self.height'''
+            
+            cte = self.margin-0.1
+            if pos[v][0] < -cte*self.width:
+                pos[v][0] = -cte*self.width
+            if pos[v][1] < -cte*self.width:
+                pos[v][1] = -cte*self.width
+            if pos[v][0] > cte*self.width:
+                pos[v][0] = cte*self.width
+            if pos[v][1] > cte*self.width:
+                pos[v][1] = cte*self.width
 
     def update_temperature(self):
         ct = self.ct
         self.temp *= ct
-        #print(self.temp)
 
     def draw(self, positions):
         plt.clf()
-        plt.xlim(-1.5*self.width, 1.5*self.width)
-        plt.ylim(-1.5*self.height, 1.5*self.height)
+        
+        plt.axis('off')
+        plt.xlim(-self.margin*self.width,  self.margin*self.width)
+        plt.ylim(-self.margin*self.width,  self.margin*self.width)
+        plt.title(self.name)                                        #Este le pone el nombre del archivo en la figura, no sé si me gusta
         
         for (a, b) in self.graph.edges:
             x = [positions[a][0], positions[b][0]]
@@ -134,7 +141,7 @@ class Layout:
 
         positions = {}
         accum = {}
-
+        plt.figure("Graph plot")
         self.randomize_positions(positions)
         self.draw(positions)
 
@@ -145,4 +152,8 @@ class Layout:
             self.compute_gravity_forces(positions, accum)
             self.update_positions(positions, accum)
             self.update_temperature()
-            self.draw(positions)
+            if i % self.refresh == 0:
+                self.draw(positions)
+        
+        print("End")    #if verbose
+        plt.show()
