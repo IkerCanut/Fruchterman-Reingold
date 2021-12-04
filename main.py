@@ -3,31 +3,6 @@ from layout import Layout
 from graph import Graph
 
 
-def lee_grafo_archivo(file_path):
-    '''
-    Lee un grafo desde un archivo y devuelve su representacion como lista.
-    Ejemplo Entrada: 
-        3
-        A
-        B
-        C
-        A B
-        B C
-        C B
-    Ejemplo retorno: 
-        (['A','B','C'],[('A','B'),('B','C'),('C','B')])
-    '''
-    with open(file_path, 'r') as f:
-        lines = f.readlines()
-        v = int(lines[0].strip())
-        V = []
-        for i in range(1, v+1):
-            V.append(lines[i].strip())
-        E = []
-        for i in range(v+1, len(lines)):
-            e = lines[i].strip().split(' ')
-            E.append((e[0], e[1]))
-        return (V, E)
 
 def parse():
     
@@ -122,8 +97,7 @@ def main():
     
     args = parse()
 
-    (V, E) = lee_grafo_archivo(args.file_name)
-    gr = Graph(V, E)
+    gr = Graph.read(args.file_name)
 
     layout_gr = Layout(
         gr,
