@@ -38,8 +38,8 @@ class Layout:
 
     def randomize_positions(self, positions):
         for v in self.graph.nodes:
-            positions[v] = [random.uniform(0, 0.5*self.width),
-                            random.uniform(0, 0.5*self.height)]
+            positions[v] = [random.uniform(-0.5*self.width,  0.5*self.width),
+                            random.uniform(-0.5*self.height, 0.5*self.height)]
 
     def initialize_accumulators(self, accum):
         for v in self.graph.nodes:
@@ -76,8 +76,8 @@ class Layout:
                     accum[v][1] += fy/2
 
     def compute_gravity_forces(self, pos, accum):
-        centro_x = self.width/2
-        centro_y = self.height/2
+        centro_x = 0
+        centro_y = 0
 
         for v in self.graph.nodes:
             distance = np.sqrt((centro_x - pos[v][0]) ** 2 +
