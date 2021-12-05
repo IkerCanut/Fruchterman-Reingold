@@ -3,9 +3,8 @@ from layout import Layout
 from graph import Graph
 
 
-
 def parse():
-    
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -38,7 +37,7 @@ def parse():
     )
     parser.add_argument(
         '-c', '--constant',
-        help='algorithm\'s force constant',
+        help='algorithm\'s force constant to modify the spread',
         dest='c',
         type=float,
         default=1.3
@@ -82,12 +81,12 @@ def parse():
         'file_name',
         help='file containing graph description'
     )
-    
+
     return parser.parse_args()
-    
+
 
 def main():
-    
+
     args = parse()
 
     graph = Graph.read(args.file_name)
@@ -105,7 +104,7 @@ def main():
         args.p,
         args.r
     )
-    
+
     layout_graph.layout()
     return
 
