@@ -34,3 +34,16 @@ An example of a simple triangle could be:
 * a b
 * b c
 * c a
+
+# Parámetros
+* **-v**, **--verbose**: Activate comments during executions.
+* **-i**, **--iterations**: Maximum number of iterations permitted. Default: 400.
+* **-t**, **--temperature**: Initial temperature. Default: 100.
+* **-d**, **--damping**: Temperature's damping factor. Default: 0.977.
+* **-c**, **--constant**: Algorithm's force constant to modify the spread. Default: 1.3.
+* **-w**, **--width**: Frame width. Default: 1000.
+* **-m**, **--margin**: Multiplier to adjust graph size. Default: 1.8.
+* **-na**, **--not-animated**: Flag to not animate the plot.
+* **-p**, **--pause**: Time between frames. Default: 0.01
+* **-r**, **--refresh**: Frames between plots. Default: 10.
+* In addition, you need to specify the file in which the graph is located.
