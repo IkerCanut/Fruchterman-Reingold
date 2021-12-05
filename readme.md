@@ -1,3 +1,5 @@
+[Castellano](readme_sp.md)
+
 # Summary
 We present an implementation of the Fruchterman-Reingold algorithm for graph visualization, made in Python3. This is a force-directed layout algorithm that treats edges like springs, which move nodes closer in an attempt to find an equilibrium that minimizes the energy of the system. Moreover, there are repulsive forces between every pair of nodes, just like the repulsion of two magnets of the same polarity. We strive for aesthetically-pleasing pictures of graphs, and this program allows, with its numerous parameters, to change the outcome.
 
