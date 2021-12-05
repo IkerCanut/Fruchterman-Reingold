@@ -58,7 +58,7 @@ def parse():
         default=1.8
     )
     parser.add_argument(
-        '-na', '--not-animate',
+        '-na', '--not-animated',
         action='store_true',
         help='do not animate the plot',
         dest='na',

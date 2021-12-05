@@ -43,14 +43,6 @@ class Layout:
         # Algorithm's constant
         self.k = self.c * np.sqrt(self.area/self.graph.n)
 
-    def fa(self, dist):
-        '''Calculates attraction force between 2 neighboring nodes'''
-        return dist*dist / self.k
-
-    def fr(self, dist):
-        '''Calculates repulsion force between 2 neighboring nodes'''
-        return self.k*self.k / dist
-
     def randomize_positions(self):
         '''Randomizes initial positions'''
         print("Randomizing positions\n") if self.verbose else None
@@ -115,12 +107,6 @@ class Layout:
 
     def update_positions(self, i):
         '''Updates positions with the previously calculated values'''
-        if (self.verbose):
-            print("\nIteration N° %d: Forces: " % i)
-            for v in self.graph.nodes:
-                print("Node %s: \t X axis = %f \t Y axis = %f" %
-                      (v, self.accum[v][0], self.accum[v][1]))
-
         for v in self.graph.nodes:
             modulo = np.sqrt(self.accum[v][0] ** 2 + self.accum[v][1] ** 2)
             if modulo > self.temp:
@@ -155,9 +141,9 @@ class Layout:
         plt.xlim(-self.margin*self.width,  self.margin*self.width)
         plt.ylim(-self.margin*self.width,  self.margin*self.width)
 
-        for (a, b) in self.graph.edges:
-            x = [self.pos[a][0], self.pos[b][0]]
-            y = [self.pos[a][1], self.pos[b][1]]
+        for (u, v) in self.graph.edges:
+            x = [self.pos[u][0], self.pos[v][0]]
+            y = [self.pos[u][1], self.pos[v][1]]
             plt.plot(x, y, marker='.', markersize=10)
         # Pause between frames
         plt.pause(self.pause)
@@ -165,13 +151,12 @@ class Layout:
     def layout(self):
         '''Applies Fruchtermann-Reingold algorithm to layout the graph'''
 
-        print("Graph has %d nodes" % self.graph.n) if self.verbose else None
-        print("and %d edges" % self.graph.m) if self.verbose else None
+        print("Graph has %d nodes and %d edges" % (self.graph.n, self.graph.m)) if self.verbose else None
 
         plt.figure("Graph plot")
         self.randomize_positions()
 
-        if(self.verbose):
+        if self.verbose:
             print("Initial positions:")
             for v in self.graph.nodes:
                 print("Node %03s \t X position = %f \t Y Position = %f" %
@@ -180,7 +165,8 @@ class Layout:
 
         min_t = 0.05
         print("Waiting until graph cools completely or iterations run short") if self.verbose else None
-        print("You can add several options to the program, run next time with -h or --help to see") if self.verbose else None
+        print("You can add several options to the program, run next time with -h or --help to see\n") if self.verbose else None
+        
         for i in range(self.iters):
             self.initialize_accumulators()
             self.compute_attraction_forces()
@@ -188,15 +174,29 @@ class Layout:
             self.compute_gravity_forces()
             self.update_positions(i)
             self.update_temperature()
+            
             if i % self.refresh == 0 and self.animate:
                 self.draw()
             if self.temp < min_t:
                 print("Graph cooled completely") if self.verbose else None
                 print("Number of iterations: %d" % i) if self.verbose else None
                 break
-
+        
+        if self.temp >= min_t:
+            print("Iterations ran short") if self.verbose else None
+            print("Number of iterations: %d" % self.iters) if self.verbose else None
+        
+        print() if self.verbose else None
+        
+        if self.verbose:
+            print("Final positions:")
+            for v in self.graph.nodes:
+                print("Node %03s \t X position = %f \t Y Position = %f" %
+                      (v, self.pos[v][0], self.pos[v][1]))
+            print()
+        
         self.draw()
         print(
-            "\nAlgorithm finished! Beautiful graph, by the way ;)") if self.verbose else None
-        print("When you're done admiring it, you can close the window") if self.verbose else None
+            "Algorithm finished! Beautiful graph, by the way ;)") if self.verbose else None
+        print("When you're done admiring it, you may close the window") if self.verbose else None
         plt.show()
