@@ -113,10 +113,10 @@ class Layout:
             self.accum[v][0] -= fx / 10
             self.accum[v][1] -= fy / 10
 
-    def update_positions(self):
+    def update_positions(self, i):
         '''Updates positions with the previously calculated values'''
         if (self.verbose):
-            print("\nNew iteration: Forces: ")
+            print("\nIteration N° %d: Forces: " % i)
             for v in self.graph.nodes:
                 print("Node %s: \t X axis = %f \t Y axis = %f" %
                       (v, self.accum[v][0], self.accum[v][1]))
@@ -174,7 +174,7 @@ class Layout:
         if(self.verbose):
             print("Initial positions:")
             for v in self.graph.nodes:
-                print("Node %s \t X position = %f \t Y Position = %f" %
+                print("Node %03s \t X position = %f \t Y Position = %f" %
                       (v, self.pos[v][0], self.pos[v][1]))
             print()
 
@@ -186,7 +186,7 @@ class Layout:
             self.compute_attraction_forces()
             self.compute_repulsion_forces()
             self.compute_gravity_forces()
-            self.update_positions()
+            self.update_positions(i)
             self.update_temperature()
             if i % self.refresh == 0 and self.animate:
                 self.draw()
