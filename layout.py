@@ -134,15 +134,19 @@ class Layout:
         '''Updates temperature with the damping factor'''
         self.temp *= self.damp
 
-    def draw(self):
+    def draw(self, color):
         '''Draws nodes (and edges) in its current positions'''
         # Clear the frame
         plt.clf()
         # Don't plot the axes
         plt.axis('off')
-        # Fix the window's size
+        # Fix window size
         plt.xlim(-self.margin*self.width,  self.margin*self.width)
         plt.ylim(-self.margin*self.width,  self.margin*self.width)
+
+        # Change the background color depending on temperature
+        figure = plt.figure("Graph plot")
+        figure.set_facecolor((color, (1-color)/1.5, 1-color, 0.2+color/4.0))
 
         for (u, v) in self.graph.edges:
             x = [self.pos[u][0], self.pos[v][0]]
@@ -167,6 +171,7 @@ class Layout:
                       (v, self.pos[v][0], self.pos[v][1]))
             print()
 
+        temp0 = self.temp
         min_t = 0.05
         print("Waiting until graph cools completely or iterations run short") if self.verbose else None
         print("You can add several options to the program, run next time with -h or --help to see\n") if self.verbose else None
@@ -180,7 +185,7 @@ class Layout:
             self.update_temperature()
 
             if i % self.refresh == 0 and self.animate:
-                self.draw()
+                self.draw(self.temp/temp0)
             if self.temp < min_t:
                 print("Graph cooled completely") if self.verbose else None
                 print("Number of iterations: %d" % i) if self.verbose else None
@@ -200,7 +205,7 @@ class Layout:
                       (v, self.pos[v][0], self.pos[v][1]))
             print()
 
-        self.draw()
+        self.draw(self.temp/temp0)
         print(
             "Algorithm finished! Beautiful graph, by the way ;)") if self.verbose else None
         print("When you're done admiring it, you may close the window") if self.verbose else None
