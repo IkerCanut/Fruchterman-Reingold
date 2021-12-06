@@ -35,7 +35,7 @@ An example of a simple triangle could be:
 * b c
 * c a
 
-# Parámetros
+# Parameters
 * **-v**, **--verbose**: Activate comments during executions.
 * **-i**, **--iterations**: Maximum number of iterations permitted. Default: 400.
 * **-t**, **--temperature**: Initial temperature. Default: 100.
