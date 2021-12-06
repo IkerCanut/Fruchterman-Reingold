@@ -47,3 +47,6 @@ Un ejemplo de un simple triángulo podría ser:
 * **-p**, **--pause**: Tiempo entre frame y frame. Default: 0.01.
 * **-r**, **--refresh**: Cantidad de iteraciones entre frame y frame. Default: 10.
 * Además, se debe especificar el archivo en donde se encuentra el grafo.
+
+# Referencias
+1. THOMAS M. J. FRUCHTERMAN, EDWARD M. REINGOLD. Graph Drawing by Force–Directed Placement, Department of Computer Science, University of Illinois at Urbana-Champaign, 1304 W. Springfield Avenue, Urbana, IL 61801-2987, U.S.A.
