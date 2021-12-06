@@ -67,6 +67,7 @@ class Layout:
         for u, v in self.graph.edges:
             distance = np.sqrt((self.pos[u][0] - self.pos[v][0]) ** 2 +
                                (self.pos[u][1] - self.pos[v][1]) ** 2)
+            distance = self.clamp_eps(distance)
 
             fx = distance * (self.pos[v][0] - self.pos[u][0]) / self.k
             fy = distance * (self.pos[v][1] - self.pos[u][1]) / self.k
@@ -82,6 +83,7 @@ class Layout:
                 if v != u:
                     distance = np.sqrt((self.pos[u][0] - self.pos[v][0]) ** 2 +
                                        (self.pos[u][1] - self.pos[v][1]) ** 2)
+                    distance = self.clamp_eps(distance)
 
                     fx = self.k*self.k / distance * \
                         (self.pos[v][0] - self.pos[u][0]) / distance
@@ -98,6 +100,7 @@ class Layout:
         for v in self.graph.nodes:
             distance = np.sqrt(self.pos[v][0] ** 2 +
                                self.pos[v][1] ** 2)
+            distance = self.clamp_eps(distance)
 
             fx = distance * (self.pos[v][0]) / self.k
             fy = distance * (self.pos[v][1]) / self.k
@@ -151,7 +154,8 @@ class Layout:
     def layout(self):
         '''Applies Fruchtermann-Reingold algorithm to layout the graph'''
 
-        print("Graph has %d nodes and %d edges" % (self.graph.n, self.graph.m)) if self.verbose else None
+        print("Graph has %d nodes and %d edges" %
+              (self.graph.n, self.graph.m)) if self.verbose else None
 
         plt.figure("Graph plot")
         self.randomize_positions()
@@ -166,7 +170,7 @@ class Layout:
         min_t = 0.05
         print("Waiting until graph cools completely or iterations run short") if self.verbose else None
         print("You can add several options to the program, run next time with -h or --help to see\n") if self.verbose else None
-        
+
         for i in range(self.iters):
             self.initialize_accumulators()
             self.compute_attraction_forces()
@@ -174,27 +178,28 @@ class Layout:
             self.compute_gravity_forces()
             self.update_positions(i)
             self.update_temperature()
-            
+
             if i % self.refresh == 0 and self.animate:
                 self.draw()
             if self.temp < min_t:
                 print("Graph cooled completely") if self.verbose else None
                 print("Number of iterations: %d" % i) if self.verbose else None
                 break
-        
+
         if self.temp >= min_t:
             print("Iterations ran short") if self.verbose else None
-            print("Number of iterations: %d" % self.iters) if self.verbose else None
-        
+            print("Number of iterations: %d" %
+                  self.iters) if self.verbose else None
+
         print() if self.verbose else None
-        
+
         if self.verbose:
             print("Final positions:")
             for v in self.graph.nodes:
                 print("Node %03s \t X position = %f \t Y Position = %f" %
                       (v, self.pos[v][0], self.pos[v][1]))
             print()
-        
+
         self.draw()
         print(
             "Algorithm finished! Beautiful graph, by the way ;)") if self.verbose else None
