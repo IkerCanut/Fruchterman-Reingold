@@ -1,6 +1,6 @@
 import argparse
-from layout import Layout
-from graph import Graph
+from src.layout import Layout
+from src.graph import Graph
 
 
 def parse():

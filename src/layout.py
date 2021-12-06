@@ -158,7 +158,7 @@ class Layout:
     def layout(self):
         '''Applies Fruchtermann-Reingold algorithm to layout the graph'''
 
-        print("Graph has %d nodes and %d edges" %
+        print("Hi!\nGraph has %d nodes and %d edges" %
               (self.graph.n, self.graph.m)) if self.verbose else None
 
         plt.figure("Graph plot")

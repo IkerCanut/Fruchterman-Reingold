@@ -35,7 +35,7 @@ An example of a simple triangle could be:
 * b c
 * c a
 
-# Parámetros
+# Parameters
 * **-v**, **--verbose**: Activate comments during executions.
 * **-i**, **--iterations**: Maximum number of iterations permitted. Default: 400.
 * **-t**, **--temperature**: Initial temperature. Default: 100.
@@ -47,3 +47,6 @@ An example of a simple triangle could be:
 * **-p**, **--pause**: Time between frames. Default: 0.01
 * **-r**, **--refresh**: Frames between plots. Default: 10.
 * In addition, you need to specify the file in which the graph is located.
+
+# References
+1. THOMAS M. J. FRUCHTERMAN, EDWARD M. REINGOLD. Graph Drawing by Force–Directed Placement, Department of Computer Science, University of Illinois at Urbana-Champaign, 1304 W. Springfield Avenue, Urbana, IL 61801-2987, U.S.A.

@@ -1,7 +1,7 @@
 [English](readme.md)
 
 # Resumen
-Presentamos una implementación del algoritmo Fruchterman-Reingold para visualización de grafos, realizada en Python3. Este es un algoritmo que plantea un sistema de fuerzas, el cual trata a las aristas como resortes, que acercan a los nodos que estan conectados, en un intento de encontrar un equilibrio que minimice la energía del sistema. Además, existen fuerzas repulsivas entre cada par de nodos, al igual que la repulsión de dos imanes de la misma polaridad. Nosotros buscamos obtener imágenes estéticamente agradables y este programa permite, con sus numerosos parámetros, cambiar el resultado.
+Presentamos una implementación del algoritmo Fruchterman-Reingold para visualización de grafos, realizada en Python3. Este es un algoritmo que plantea un sistema de fuerzas, el cual trata a las aristas como resortes, que acercan a los nodos que están conectados, en un intento de encontrar un equilibrio que minimice la energía del sistema. Además, existen fuerzas repulsivas entre cada par de nodos, al igual que la repulsión de dos imanes de la misma polaridad. Buscamos obtener imágenes estéticamente agradables y este programa permite, con sus numerosos parámetros, cambiar el resultado.
 
 # Dependencias
 Para poder ejecutar el programa, se deben instalar los siguientes paquetes:
@@ -12,13 +12,13 @@ Para poder ejecutar el programa, se deben instalar los siguientes paquetes:
 ```
 
 # Ejemplo
-Nosotros presentamos este código con algunos grafos, de esta manera se puede probar:
+Presentamos este código con algunos grafos, de esta manera se puede probar:
 ```bash
     python3 main.py -i 400 --verbose grafos/malla.txt
 ```
 
 # Formato de grafos
-En la primer linea tenemos la cantidad de vértices. En las siguientes n lineas, tenemos el nombre de cada nodo. Finalmente, tenemos las aristas, con los vértices en los cuales inciden separados por un espacio.
+En la primera línea tenemos la cantidad de vértices. En las siguientes n líneas, tenemos el nombre de cada nodo. Finalmente, tenemos las aristas, con los vértices en los cuales inciden separados por un espacio.
 * [Cantidad de Vértices]
 * [Nombre del Vértice 0]
 * ...
@@ -26,7 +26,7 @@ En la primer linea tenemos la cantidad de vértices. En las siguientes n lineas,
 * [Nombre del Vértice u] [Nombre del Vértice v]
 * ...
 
-Un ejemplo de un simple triangulo podría ser:
+Un ejemplo de un simple triángulo podría ser:
 * 3
 * a
 * b
@@ -46,4 +46,7 @@ Un ejemplo de un simple triangulo podría ser:
 * **-na**, **--not-animated**: Bandera para no animar el algoritmo.
 * **-p**, **--pause**: Tiempo entre frame y frame. Default: 0.01.
 * **-r**, **--refresh**: Cantidad de iteraciones entre frame y frame. Default: 10.
-* Además, se debe especificar el archivo en donde se encuentra el gráfico.
+* Además, se debe especificar el archivo en donde se encuentra el grafo.
+
+# Referencias
+1. THOMAS M. J. FRUCHTERMAN, EDWARD M. REINGOLD. Graph Drawing by Force–Directed Placement, Department of Computer Science, University of Illinois at Urbana-Champaign, 1304 W. Springfield Avenue, Urbana, IL 61801-2987, U.S.A.
