@@ -185,7 +185,8 @@ class Layout:
             self.update_temperature()
 
             if i % self.refresh == 0 and self.animate:
-                self.draw(self.temp/temp0)
+                color = self.temp/temp0
+                self.draw(color if color < 1 else 1)
             if self.temp < min_t:
                 print("Graph cooled completely") if self.verbose else None
                 print("Number of iterations: %d" % i) if self.verbose else None
@@ -205,7 +206,8 @@ class Layout:
                       (v, self.pos[v][0], self.pos[v][1]))
             print()
 
-        self.draw(self.temp/temp0)
+        color = self.temp/temp0
+        self.draw(color if color < 1 else 1)
         print(
             "Algorithm finished! Beautiful graph, by the way ;)") if self.verbose else None
         print("When you're done admiring it, you may close the window") if self.verbose else None
