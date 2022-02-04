@@ -77,7 +77,7 @@ class Layout:
             self.accum[v][1] -= fy
 
     def compute_repulsion_forces(self):
-        '''Computes the attraction force between each pair of nodes'''
+        '''Computes the repulsion force between each pair of nodes'''
         for u in self.graph.nodes:
             for v in self.graph.nodes:
                 if v != u:
